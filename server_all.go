@@ -57,6 +57,7 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 	return s, err
 }
 
+// acceptLoop - continuously accepts incoming connections and handles them.
 func (s *Server) acceptLoop() {
 
 	for {
@@ -91,6 +92,7 @@ func (s *Server) acceptLoop() {
 
 }
 
+// read - reads messages from the connection.
 func (s *Server) read() {
 
 	bLen := make([]byte, 4)
@@ -140,6 +142,7 @@ func (s *Server) read() {
 
 }
 
+// readData - reads data from the connection into the provided buffer.
 func (s *Server) readData(buff []byte) bool {
 
 	_, err := io.ReadFull(s.conn, buff)
@@ -160,12 +163,15 @@ func (s *Server) readData(buff []byte) bool {
 			return false
 		}
 
+		// Log the error
+		s.received <- &Message{Err: err, MsgType: -1}
+		return false
 	}
 
 	return true
 }
 
-// Read - blocking function, reads each message recieved
+// Read - blocking function, reads each message received
 // if MsgType is a negative number its an internal message
 func (s *Server) Read() (*Message, error) {
 
@@ -208,6 +214,7 @@ func (s *Server) Write(msgType int, message []byte) error {
 	return nil
 }
 
+// write - writes messages to the connection.
 func (s *Server) write() {
 
 	for {
@@ -251,13 +258,11 @@ func (s *Server) write() {
 	}
 }
 
-
 // getStatus - get the current status of the connection
 func (s *Server) getStatus() Status {
 
 	return s.status
 }
-
 
 // StatusCode - returns the current connection status
 func (s *Server) StatusCode() Status {

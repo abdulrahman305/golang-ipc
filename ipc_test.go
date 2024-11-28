@@ -102,49 +102,6 @@ func TestStartUp_Configs(t *testing.T) {
 	})
 }
 
-/*
-func TestStartUp_Timeout(t *testing.T) {
-
-	scon := &ServerConfig{
-		Timeout: 1,
-	}
-
-	sc, _ := StartServer("test_dummy", scon)
-
-	for {
-		_, err1 := sc.Read()
-
-		if err1 != nil {
-			if err1.Error() != "timed out waiting for client to connect" {
-				t.Error("should of got server timeout")
-			}
-			break
-		}
-
-	}
-
-	ccon := &ClientConfig{
-		Timeout:    2,
-		RetryTimer: 1,
-	}
-
-	cc, _ := StartClient("test2", ccon)
-
-	for {
-		_, err := cc.Read()
-		if err != nil {
-			if err.Error() != "timed out trying to connect" {
-				t.Error("should of got timeout as client was trying to connect")
-			}
-
-			break
-
-		}
-	}
-
-}
-*/
-
 func TestWrite(t *testing.T) {
 
 	sc, err := StartServer("test10", nil)

@@ -58,6 +58,7 @@ func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 	return cc, nil
 }
 
+// startClient - initiates the client connection process.
 func startClient(c *Client) {
 
 	c.status = Connecting
@@ -76,6 +77,7 @@ func startClient(c *Client) {
 	go c.write()
 }
 
+// read - reads messages from the connection.
 func (c *Client) read() {
 	bLen := make([]byte, 4)
 
@@ -83,6 +85,7 @@ func (c *Client) read() {
 
 		res := c.readData(bLen)
 		if !res {
+			log.Println("error reading data length")
 			break
 		}
 
@@ -92,12 +95,14 @@ func (c *Client) read() {
 
 		res = c.readData(msgRecvd)
 		if !res {
+			log.Println("error reading message data")
 			break
 		}
 
 		if c.encryption {
 			msgFinal, err := decrypt(*c.enc.cipher, msgRecvd)
 			if err != nil {
+				log.Println("error decrypting message data", err)
 				break
 			}
 
@@ -118,6 +123,7 @@ func (c *Client) read() {
 	}
 }
 
+// readData - reads data from the connection into the provided buffer.
 func (c *Client) readData(buff []byte) bool {
 
 	_, err := io.ReadFull(c.conn, buff)
@@ -139,6 +145,7 @@ func (c *Client) readData(buff []byte) bool {
 		}
 
 		// other read error
+		log.Println("error reading data", err)
 		return false
 
 	}
@@ -147,6 +154,7 @@ func (c *Client) readData(buff []byte) bool {
 
 }
 
+// reconnect - attempts to reconnect the client.
 func (c *Client) reconnect() {
 
 	c.status = ReConnecting
@@ -169,7 +177,7 @@ func (c *Client) reconnect() {
 	go c.read()
 }
 
-// Read - blocking function that receices messages
+// Read - blocking function that receives messages
 // if MsgType is a negative number its an internal message
 func (c *Client) Read() (*Message, error) {
 
@@ -209,6 +217,7 @@ func (c *Client) Write(msgType int, message []byte) error {
 	return nil
 }
 
+// write - writes messages to the connection.
 func (c *Client) write() {
 
 	for {
